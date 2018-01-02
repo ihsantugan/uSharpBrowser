@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Runtime.InteropServices.ComTypes;
+using uSharpBrowser.Utilities;
 
 namespace uSharpBrowser
 {
@@ -15,10 +17,15 @@ namespace uSharpBrowser
         {
             _dispatch = dispatch;
             _type = dispatch.GetType();
-            //Type type = DispatchUtility.GetType(jObject, false);
-            //var a = _type.GetProperties();
-            //var b = _type.GetMethods();
-            //var c = _type.GetMembers();
+            ITypeInfo type = DispatchUtility.GetType(_dispatch);
+
+            //Type t = type.GetType();
+            //Type typaae = Type.GetTypeFromProgID("JScriptTypeLib.JScriptTypeInfo", true);
+
+            //PropertyInfo[] a = type.GetProperties();
+            //MethodInfo[] b = type.GetMethods();
+            //MemberInfo[] c = type.GetMembers();
+            //EventInfo[] e = type.GetEvents();
         }
 
         public JqueryObject Next()
@@ -33,7 +40,20 @@ namespace uSharpBrowser
 
         public List<JqueryObject> NextAll()
         {
-            IDispatch a = InvokeMember<IDispatch>("nextAll");
+            IDispatch dispatch = InvokeMember<IDispatch>("nextAll");
+
+            string name = "length";
+            int dispId;
+            Guid riid = Guid.Empty;
+            HRESULT res = dispatch.GetDispId(ref riid, name, 1, 0, out dispId);
+
+            int length = (int)dispatch.GetType().InvokeMember("length", BindingFlags.GetProperty, null, dispatch, null);
+            int length2 = (int)dispatch.GetType().InvokeMember("length", BindingFlags.GetProperty, null, dispatch, null);
+            for (int index = 0; index < length; index++)
+            {
+                IDispatch obj = dispatch.GetType().InvokeMember(index.ToString(), BindingFlags.GetProperty, null, dispatch, null) as IDispatch;
+            }
+
             return null;
         }
 
@@ -45,6 +65,11 @@ namespace uSharpBrowser
                 return null;
             }
             return new JqueryObject(jObj);
+        }
+
+        public int Length()
+        {
+            return InvokeMember<int>("length");
         }
 
         public string Html()

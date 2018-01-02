@@ -12,12 +12,12 @@ namespace uSharpBrowser
 {
     public class SharpBrowser : WebBrowser
     {
-        private HtmlElement _scriptElement;
+        private HtmlElement _jqueryScriptElement, head;
         private bool _loadingCompleted;
         private string jqueryText;
 
-        private List<Script> _Scripts = new List<Script>();
-        public ReadOnlyCollection<Script> Scripts { get { return _Scripts.AsReadOnly(); } }
+        private List<Script> _scripts = new List<Script>();
+        public ReadOnlyCollection<Script> Scripts { get { return _scripts.AsReadOnly(); } }
 
         public SharpBrowser()
         {
@@ -33,34 +33,25 @@ namespace uSharpBrowser
         protected override void OnNavigating(WebBrowserNavigatingEventArgs e)
         {
             base.OnNavigating(e);
-            _scriptElement = null;
+            _scripts.Clear();
+            head = _jqueryScriptElement = null;
         }
 
         protected override void OnDocumentCompleted(WebBrowserDocumentCompletedEventArgs e)
         {
             if (Document != null && ReadyState == WebBrowserReadyState.Complete)
             {
-                _Scripts.Clear();
+                _scripts.Clear();
                 IHTMLDocument2 doc = (IHTMLDocument2)Document.DomDocument;
 
                 IHTMLElementCollection scripts = doc.scripts;
                 foreach (HTMLScriptElement script in scripts)
                 {
-                    _Scripts.Add(new Script(script));
+                    _scripts.Add(new Script(script));
                 }
 
-                HtmlElement head = Document.GetElementsByTagName("head")[0];
-                _scriptElement = Document.CreateElement("script");
-                if (_scriptElement != null)
-                {
-                    _scriptElement.SetAttribute("type", "text/javascript");
-                    ((IHTMLScriptElement)_scriptElement.DomElement).text = jqueryText;
-                    head.AppendChild(_scriptElement);
-                }
-                else
-                {
-                    throw new Exception("Script registration failed");
-                }
+                head = Document.GetElementsByTagName("head")[0];
+                RegisterJsFunction();
 
                 Graphics graph;
                 IntPtr hdc;
@@ -84,13 +75,21 @@ namespace uSharpBrowser
         {
             WaitUntilDocumentLoad();
 
-            if (_scriptElement == null)
+            if (_jqueryScriptElement == null)
             {
                 RegisterJsFunction();
             }
 
-            ((IHTMLScriptElement)_scriptElement.DomElement).text = "function uWebBrowser() { return $('.headerRow'); }";
+            ((IHTMLScriptElement)_jqueryScriptElement.DomElement).text = "function uWebBrowser() { return $('" + query + "'); }";
             IDispatch dispatch = Document.InvokeScript("uWebBrowser") as IDispatch;
+
+            //Guid dummy = Guid.Empty;
+            //string name = "next";
+            //dispatch.GetDispId(ref dummy, ref name, 1, 0, out int dispId);
+            //string[] rgsNames = new string[1];
+            //rgsNames[0] = "next";
+            //int[] rgDispId = new int[1] { 0 };
+            //dispatch.GetIDsOfNames(ref dummy, new string[1] { name }, 1, DispatchConstants.LOCALE_SYSTEM_DEFAULT, rgDispId);
 
             return new JqueryObject(dispatch);
         }
@@ -119,34 +118,29 @@ namespace uSharpBrowser
 
         private void RegisterJsFunction()
         {
-            if (Document != null)
+            _jqueryScriptElement = Document.CreateElement("script");
+            if (_jqueryScriptElement != null)
             {
-                HtmlElement head = Document.GetElementsByTagName("head")[0];
-                _scriptElement = Document.CreateElement("script");
-                if (_scriptElement != null)
-                {
-                    IHTMLScriptElement element = (IHTMLScriptElement)_scriptElement.DomElement;
-                    head.AppendChild(_scriptElement);
-                }
-                else
-                {
-                    throw new Exception("Script registration failed");
-                }
+                _jqueryScriptElement.SetAttribute("type", "text/javascript");
+                ((IHTMLScriptElement)_jqueryScriptElement.DomElement).text = jqueryText;
+                head.AppendChild(_jqueryScriptElement);
+            }
+            else
+            {
+                throw new Exception("Script registration failed");
             }
         }
 
         private void WaitUntilDocumentLoad()
         {
-            if (!_loadingCompleted)
+            while (true)
             {
-                while (true)
+                if (ReadyState == WebBrowserReadyState.Complete &&
+                    _loadingCompleted)
                 {
-                    if (ReadyState == WebBrowserReadyState.Complete)
-                    {
-                        break;
-                    }
-                    Application.DoEvents();
+                    break;
                 }
+                Application.DoEvents();
             }
         }
     }

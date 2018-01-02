@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.ComTypes;
 using System.Security.Permissions;
 
 namespace uSharpBrowser.Utilities
@@ -10,10 +11,25 @@ namespace uSharpBrowser.Utilities
         #region Public Methods
 
         [SecurityPermission(SecurityAction.LinkDemand, Flags = SecurityPermissionFlag.UnmanagedCode)]
-        public static Type GetType(JqueryObject jObject, bool throwIfNotFound)
+        public static ITypeInfo GetType(IDispatch dispatch, bool throwIfNotFound = false)
         {
-            Guard.ArgumentNotNull(jObject, "jObject");
-            return GetType(jObject.Dispatch, throwIfNotFound);
+            Guard.ArgumentNotNull(dispatch, "dispatch");
+
+            ITypeInfo result = null;
+            int typeInfoCount;
+            HRESULT hr = dispatch.GetTypeInfoCount(out typeInfoCount);
+            if (hr == HRESULT.S_OK && typeInfoCount > 0)
+            {
+                dispatch.GetTypeInfo(0, DispatchConstants.LOCALE_SYSTEM_DEFAULT, out result);
+            }
+
+            if (result == null && throwIfNotFound)
+            {
+                Marshal.ThrowExceptionForHR((int)hr);
+                throw new TypeLoadException();
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -74,29 +90,6 @@ namespace uSharpBrowser.Utilities
         #endregion
 
         #region Private Methods
-
-
-
-        private static Type GetType(IDispatch dispatch, bool throwIfNotFound)
-        {
-            Guard.ArgumentNotNull(dispatch, "dispatch");
-
-            Type result = null;
-            int typeInfoCount;
-            HRESULT hr = dispatch.GetTypeInfoCount(out typeInfoCount);
-            if (hr == HRESULT.S_OK && typeInfoCount > 0)
-            {
-                dispatch.GetTypeInfo(0, DispatchConstants.LOCALE_SYSTEM_DEFAULT, out result);
-            }
-
-            if (result == null && throwIfNotFound)
-            {
-                Marshal.ThrowExceptionForHR((int)hr);
-                throw new TypeLoadException();
-            }
-
-            return result;
-        }
 
         /// <summary>
         /// Tries to get the DISPID for the requested member name.

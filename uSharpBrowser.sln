@@ -5,6 +5,10 @@ VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "uSharpBrowser", "uSharpBrowser\uSharpBrowser.csproj", "{899D88FD-E2C1-4745-9D90-CCE9D3E50718}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Examples", "Examples", "{2E84BB93-C969-4334-BAF5-DC19C31697FB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestApp", "TestApp\TestApp.csproj", "{3A5022CC-AE91-4080-9DA2-73905F5AEA0C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,9 +19,16 @@ Global
 		{899D88FD-E2C1-4745-9D90-CCE9D3E50718}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{899D88FD-E2C1-4745-9D90-CCE9D3E50718}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{899D88FD-E2C1-4745-9D90-CCE9D3E50718}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3A5022CC-AE91-4080-9DA2-73905F5AEA0C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3A5022CC-AE91-4080-9DA2-73905F5AEA0C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3A5022CC-AE91-4080-9DA2-73905F5AEA0C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3A5022CC-AE91-4080-9DA2-73905F5AEA0C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{3A5022CC-AE91-4080-9DA2-73905F5AEA0C} = {2E84BB93-C969-4334-BAF5-DC19C31697FB}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5A4A75E9-4024-42D3-804F-8AA759B297DE}

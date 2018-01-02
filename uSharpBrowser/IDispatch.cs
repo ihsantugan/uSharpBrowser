@@ -38,9 +38,15 @@ namespace uSharpBrowser
         /// <param name="typeInfo">Returns the object's Type information.</param>
         /// <returns>S_OK | DISP_E_BADINDEX</returns>
         /// <remarks>http://msdn.microsoft.com/en-us/library/cc1ec9aa-6c40-4e70-819c-a7c6dd6b8c99(VS.85)</remarks>
-        void GetTypeInfo(int typeInfoIndex, int lcid,
-            [MarshalAs(UnmanagedType.CustomMarshaler,
-            MarshalTypeRef = typeof(System.Runtime.InteropServices.CustomMarshalers.TypeToTypeInfoMarshaler))] out Type typeInfo);
+        [PreserveSig]
+        int GetTypeInfo(
+            [MarshalAs(UnmanagedType.U4)] int iTInfo,
+            [MarshalAs(UnmanagedType.U4)] int lcid,
+            out System.Runtime.InteropServices.ComTypes.ITypeInfo typeInfo);
+        //[PreserveSig]
+        //void GetTypeInfo(int typeInfoIndex, int lcid,
+        //    [MarshalAs(UnmanagedType.CustomMarshaler,
+        //    MarshalTypeRef = typeof(System.Runtime.InteropServices.CustomMarshalers.TypeToTypeInfoMarshaler))] out Type typeInfo);
 
         //[return: MarshalAs(UnmanagedType.Interface)]
         //ITypeInfo GetTypeInfo([In, MarshalAs(UnmanagedType.U4)] int iTInfo, [In, MarshalAs(UnmanagedType.U4)] int lcid);
@@ -71,6 +77,7 @@ namespace uSharpBrowser
         /// <param name="rgDispId">Caller-allocated array, each element of which contains an identifier (ID) corresponding to one of the names passed in the rgszNames array. The first element represents the member name. The subsequent elements represent each of the member's parameters.</param>
         /// <returns>S_OK | E_OUTOFMEMORY | DISP_E_UNKNOWNNAME | DISP_E_UNKNOWNLCID</returns>
         /// <remarks>https://msdn.microsoft.com/en-us/library/windows/desktop/ms221306(v=vs.85).aspx</remarks>
+        [PreserveSig]
         HRESULT GetIDsOfNames(
             [In] ref Guid riid,
             [In, MarshalAs(UnmanagedType.LPArray)] string[] rgszNames,
